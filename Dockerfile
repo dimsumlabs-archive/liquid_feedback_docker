@@ -2,7 +2,7 @@
 # sure you lock down to a specific version, not to `latest`!
 # See https://github.com/phusion/baseimage-docker/blob/master/Changelog.md for
 # a list of version numbers.
-FROM debian:squeeze
+FROM phusion/baseimage:0.9.9
 
 # Set correct environment variables.
 ENV HOME /root
@@ -10,7 +10,10 @@ ENV HOME /root
 # Regenerate SSH host keys. baseimage-docker does not contain any, so you
 # have to do that yourself. You may also comment out this instruction; the
 # init system will auto-generate one during boot.
-#RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
+RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
+
+# Use baseimage-docker's init system.
+CMD ["/sbin/my_init"]
 
 RUN sed -i "s/archive.ubuntu.com/ftp.cuhk.edu.hk\/pub\/Linux/" /etc/apt/sources.list
 RUN apt-get update
@@ -33,9 +36,9 @@ RUN cp core.sql lf_update /opt/liquid_feedback_core/
 WORKDIR /opt/liquid_feedback_core
 RUN su postgres -c "/etc/init.d/postgresql start" \
     && su www-data -c "createdb liquid_feedback" \
-    && su www-data -c "createlang plpgsql liquid_feedback" \
     && su www-data -c "psql -v ON_ERROR_STOP=1 -f core.sql liquid_feedback" \
     && su www-data -c "psql liquid_feedback"
+#    && su www-data -c "createlang plpgsql liquid_feedback" \
 
 # Install WebMCP:
 WORKDIR /root/install
@@ -76,17 +79,39 @@ RUN make
 #RUN dpkg-reconfigure exim4-config
 
 #Create webserver configuration for LiquidFeedback:
-ADD 60-liquidfeedback.conf /etc/lighttpd/conf-available/
+ADD config/60-liquidfeedback.conf /etc/lighttpd/conf-available/
 RUN ln -s /etc/lighttpd/conf-available/60-liquidfeedback.conf /etc/lighttpd/conf-enabled/
 
 # Configure LiquidFeedback-Frontend:
+ADD config/myconfig.lua /opt/liquid_feedback_frontend/config/myconfig.lua
+WORKDIR /opt/liquid_feedback_core
+RUN su postgres -c "/etc/init.d/postgresql start" && su www-data -c "./lf_update dbname=liquid_feedback && echo OK"
 
+USER root
+ADD scripts/lf_updated /opt/liquid_feedback_core/lf_updated
+RUN mkdir /etc/service/lf_updated
+ADD scripts/lf_updated_d /etc/service/lf_updated/run
 
+WORKDIR /opt/liquid_feedback_frontend/
 
+# this command hangs for some reason
+#RUN su postgres  -c "/etc/init.d/postgresql start" && \
+#    su www-data -c "echo 'Event:send_notifications_loop()' | ../webmcp/bin/webmcp_shell myconfig"
 
+WORKDIR /opt/liquid_feedback_core
+ADD scripts/create_admin.sql /tmp/create_admin.sql
+RUN su postgres -c "/etc/init.d/postgresql start" && \
+    su www-data -c "psql liquid_feedback < /tmp/create_admin.sql"
 
+# these don't load on startup -_-
+RUN mkdir /etc/service/lighttpd
+ADD scripts/start_lighttpd /etc/service/lighttpd/run
 
+# don't know how to start psql without forking
+RUN mkdir /etc/service/psql
+ADD scripts/start_psql /etc/service/psql/run
 
+WORKDIR /root
 
 # Clean up APT when done.
-#RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
