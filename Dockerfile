@@ -63,14 +63,30 @@ RUN tar -xvzf liquid_feedback_frontend-v2.2.1.tar.gz
 RUN mv liquid_feedback_frontend-v2.2.1 /opt/liquid_feedback_frontend
 
 # Create HTML code for help texts:
-WORKDIR /opt/liquid_feedback_frontend/locale
-RUN PATH=/opt/rocketwiki-lqfb:$PATH make
+#WORKDIR /opt/liquid_feedback_frontend/locale
+#RUN PATH=/opt/rocketwiki-lqfb:$PATH make
+# the above doesn't build
+
+RUN chown www-data /opt/liquid_feedback_frontend/tmp
+WORKDIR /opt/liquid_feedback_frontend/fastpath
+RUN sed -i 's/testing\/app/frontend/' getpic.c
+RUN make
+
+# TODO: configure mail server
+#RUN dpkg-reconfigure exim4-config
+
+#Create webserver configuration for LiquidFeedback:
+ADD 60-liquidfeedback.conf /etc/lighttpd/conf-available/
+RUN ln -s /etc/lighttpd/conf-available/60-liquidfeedback.conf /etc/lighttpd/conf-enabled/
+
+# Configure LiquidFeedback-Frontend:
 
 
-# Use baseimage-docker's init system.
-#CMD ["/sbin/my_init"]
 
-# ...put your own build instructions here...
+
+
+
+
 
 # Clean up APT when done.
 #RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
