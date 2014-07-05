@@ -32,7 +32,7 @@ RUN tar -xvzf liquid_feedback_core-v2.2.1.tar.gz
 WORKDIR liquid_feedback_core-v2.2.1
 RUN make
 RUN mkdir /opt/liquid_feedback_core
-RUN cp core.sql lf_update /opt/liquid_feedback_core/
+RUN cp core.sql lf_update lf_update_suggestion_order /opt/liquid_feedback_core/
 WORKDIR /opt/liquid_feedback_core
 RUN su postgres -c "/etc/init.d/postgresql start" \
     && su www-data -c "createdb liquid_feedback" \
@@ -89,8 +89,9 @@ RUN su postgres -c "/etc/init.d/postgresql start" && su www-data -c "./lf_update
 
 USER root
 ADD scripts/lf_updated /opt/liquid_feedback_core/lf_updated
-RUN mkdir /etc/service/lf_updated
-ADD scripts/lf_updated_d /etc/service/lf_updated/run
+ADD scripts/lf_update_run /etc/service/lf_updated/run
+ADD scripts/start_lighttpd /etc/service/lighttpd/run
+ADD scripts/start_psql /etc/service/psql/run
 
 WORKDIR /opt/liquid_feedback_frontend/
 
@@ -103,15 +104,9 @@ ADD scripts/create_admin.sql /tmp/create_admin.sql
 RUN su postgres -c "/etc/init.d/postgresql start" && \
     su www-data -c "psql liquid_feedback < /tmp/create_admin.sql"
 
-# these don't load on startup -_-
-RUN mkdir /etc/service/lighttpd
-ADD scripts/start_lighttpd /etc/service/lighttpd/run
-
-# don't know how to start psql without forking
-RUN mkdir /etc/service/psql
-ADD scripts/start_psql /etc/service/psql/run
-
 WORKDIR /root
+
+EXPOSE 80
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

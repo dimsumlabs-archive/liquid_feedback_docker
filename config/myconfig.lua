@@ -35,7 +35,7 @@ config.use_terms_checkboxes = {
   
 -- Absolute base url of application
 -- ------------------------------------------------------------------------
-config.absolute_base_url = "http://example.com/"
+config.absolute_base_url = "/lf/"
 
 
 -- Connection information for the LiquidFeedback database
@@ -46,8 +46,8 @@ config.database = { engine='postgresql', dbname='liquid_feedback' }
 -- Location of the rocketwiki binaries
 -- ------------------------------------------------------------------------
 config.formatting_engine_executeables = {
-  rocketwiki= "/opt/lf/rocketwiki/rocketwiki-lqfb",
-  compat = "/opt/lf/rocketwiki/rocketwiki-lqfb-compat"
+  rocketwiki= "/opt/rocketwiki-lqfb/rocketwiki-lqfb",
+  compat = "/opt/rocketwiki-lqfb/rocketwiki-lqfb-compat"
 }
 
 

@@ -12,5 +12,5 @@ docker build -t dimsumlabs/lqfb .
 
 run with
 ```
-docker run -i -t dimsumlabs/lqfb /sbin/my_init -- bash -l
+docker run -p 8080:80 -i -t dimsumlabs/lqfb /sbin/my_init -- bash -l
 ```
