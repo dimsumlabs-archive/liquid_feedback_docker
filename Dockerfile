@@ -65,10 +65,9 @@ RUN wget http://www.public-software-group.org/pub/projects/liquid_feedback/front
 RUN tar -xvzf liquid_feedback_frontend-v2.2.1.tar.gz
 RUN mv liquid_feedback_frontend-v2.2.1 /opt/liquid_feedback_frontend
 
-# Create HTML code for help texts:
-#WORKDIR /opt/liquid_feedback_frontend/locale
-#RUN PATH=/opt/rocketwiki-lqfb:$PATH make
-# the above doesn't build
+# Create HTML code for help texts (lots of errors but seems to work anyway)
+WORKDIR /opt/liquid_feedback_frontend/locale/help
+RUN for file in *.txt; do /opt/rocketwiki-lqfb/rocketwiki-lqfb < $file > $file.html; done
 
 RUN chown www-data /opt/liquid_feedback_frontend/tmp
 WORKDIR /opt/liquid_feedback_frontend/fastpath
@@ -106,7 +105,16 @@ RUN su postgres -c "/etc/init.d/postgresql start" && \
 
 WORKDIR /root
 
-EXPOSE 80
+EXPOSE 443
+
+ADD selfsigned.pem /etc/lighttpd/selfsigned.pem
+RUN chown www-data:www-data /etc/lighttpd/selfsigned.pem
+ADD config/10-ssl.conf /etc/lighttpd/conf-available/10-ssl.conf
+RUN ln -s  /etc/lighttpd/conf-available/10-ssl.conf  /etc/lighttpd/conf-enabled/10-ssl.conf
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+
+
+
