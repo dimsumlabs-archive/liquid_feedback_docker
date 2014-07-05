@@ -14,5 +14,5 @@ generate ```./selfsigned.pem``` or get a proper certificate somewhere.
 
 run with
 ```
-docker run -p 8080:80 -i -t dimsumlabs/lqfb /sbin/my_init -- bash -l
+docker run -p 443:443 -p 80:80 -i -t dimsumlabs/lqfb /sbin/my_init -- bash -l
 ```
