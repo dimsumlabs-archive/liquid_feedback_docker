@@ -5,14 +5,16 @@ This should set up a docker container running liquid feedback.
 
 Based on http://dev.liquidfeedback.org/trac/lf/wiki/installation.
 
+Generate ```./selfsigned.pem``` or get a proper certificate somewhere.
+
+
 Build with
 ```
 docker build -t dimsumlabs/lqfb .
 ```
 
-generate ```./selfsigned.pem``` or get a proper certificate somewhere.
 
-run with
+Run with
 ```
-docker run -p 8080:80 -i -t dimsumlabs/lqfb /sbin/my_init -- bash -l
+docker run -p 443:443 -p 80:80 -i -t dimsumlabs/lqfb /sbin/my_init -- bash -l
 ```
