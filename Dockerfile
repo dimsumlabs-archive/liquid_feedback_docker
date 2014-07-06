@@ -18,8 +18,10 @@ CMD ["/sbin/my_init"]
 RUN sed -i "s/archive.ubuntu.com/ftp.cuhk.edu.hk\/pub\/Linux/" /etc/apt/sources.list
 RUN apt-get update
 RUN apt-get -y upgrade
-RUN apt-get -y install lua5.1 postgresql build-essential libpq-dev liblua5.1-0-dev lighttpd ghc libghc6-parsec3-dev imagemagick exim4
+RUN apt-get -y install lua5.1 postgresql build-essential libpq-dev liblua5.1-0-dev lighttpd ghc libghc6-parsec3-dev imagemagick postfix
 RUN apt-get -y install wget
+
+ADD scripts /tmp/
 
 USER postgres
 RUN /etc/init.d/postgresql start && createuser -d -R -S www-data
@@ -34,11 +36,13 @@ RUN make
 RUN mkdir /opt/liquid_feedback_core
 RUN cp core.sql lf_update lf_update_suggestion_order /opt/liquid_feedback_core/
 WORKDIR /opt/liquid_feedback_core
+RUN ls -lah /tmp/
 RUN su postgres -c "/etc/init.d/postgresql start" \
     && su www-data -c "createdb liquid_feedback" \
     && su www-data -c "psql -v ON_ERROR_STOP=1 -f core.sql liquid_feedback" \
-    && su www-data -c "psql liquid_feedback"
+    && su www-data -c "psql liquid_feedback < /tmp/defaults.sql"
 #    && su www-data -c "createlang plpgsql liquid_feedback" \
+
 
 # Install WebMCP:
 WORKDIR /root/install
@@ -99,7 +103,6 @@ WORKDIR /opt/liquid_feedback_frontend/
 #    su www-data -c "echo 'Event:send_notifications_loop()' | ../webmcp/bin/webmcp_shell myconfig"
 
 WORKDIR /opt/liquid_feedback_core
-ADD scripts/create_admin.sql /tmp/create_admin.sql
 RUN su postgres -c "/etc/init.d/postgresql start" && \
     su www-data -c "psql liquid_feedback < /tmp/create_admin.sql"
 
