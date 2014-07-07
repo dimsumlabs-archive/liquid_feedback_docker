@@ -7,14 +7,20 @@ Based on http://dev.liquidfeedback.org/trac/lf/wiki/installation.
 
 Edit the following files to your liking:
 ```
+├── Dockerfile
 ├── config
 │   ├── 10-ssl.conf
 │   ├── 60-liquidfeedback.conf
 │   └── myconfig.lua
 ```
 
-Generate ```./selfsigned.pem``` or get a proper certificate somewhere.
-
+Generate ```./selfsigned.pem``` or get a proper certificate somewhere,
+```
+openssl genrsa -des3 -out testing.key 2048
+openssl req -new -key testing.key -out testing.csr
+openssl x509 -req -days 365 -in testing.csr -signkey testing.key -out testing.crt
+cat testing.key testing.crt > selfsigned.pem
+```
 
 Build with
 ```
