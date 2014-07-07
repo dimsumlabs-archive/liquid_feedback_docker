@@ -95,6 +95,7 @@ ADD scripts/lf_updated /opt/liquid_feedback_core/lf_updated
 ADD scripts/lf_update_run /etc/service/lf_updated/run
 ADD scripts/start_lighttpd /etc/service/lighttpd/run
 ADD scripts/start_psql /etc/service/psql/run
+ADD scripts/postfix /etc/service/postfix/run
 
 WORKDIR /opt/liquid_feedback_frontend/
 
