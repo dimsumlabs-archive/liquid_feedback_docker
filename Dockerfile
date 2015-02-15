@@ -2,15 +2,10 @@
 # sure you lock down to a specific version, not to `latest`!
 # See https://github.com/phusion/baseimage-docker/blob/master/Changelog.md for
 # a list of version numbers.
-FROM phusion/baseimage:0.9.9
+FROM phusion/baseimage:0.9.16
 
 # Set correct environment variables.
 ENV HOME /root
-
-# Regenerate SSH host keys. baseimage-docker does not contain any, so you
-# have to do that yourself. You may also comment out this instruction; the
-# init system will auto-generate one during boot.
-RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
 
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
@@ -108,17 +103,12 @@ RUN su postgres -c "/etc/init.d/postgresql start" && \
     su www-data -c "psql liquid_feedback < /tmp/create_admin.sql"
 
 WORKDIR /root
+#EXPOSE 443
 
-EXPOSE 443
-
-ADD selfsigned.pem /etc/lighttpd/selfsigned.pem
-RUN chown www-data:www-data /etc/lighttpd/selfsigned.pem
-ADD config/10-ssl.conf /etc/lighttpd/conf-available/10-ssl.conf
-RUN ln -s  /etc/lighttpd/conf-available/10-ssl.conf  /etc/lighttpd/conf-enabled/10-ssl.conf
+#ADD selfsigned.pem /etc/lighttpd/selfsigned.pem
+#RUN chown www-data:www-data /etc/lighttpd/selfsigned.pem
+#ADD config/10-ssl.conf /etc/lighttpd/conf-available/10-ssl.conf
+#RUN ln -s  /etc/lighttpd/conf-available/10-ssl.conf  /etc/lighttpd/conf-enabled/10-ssl.conf
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-
-
-
