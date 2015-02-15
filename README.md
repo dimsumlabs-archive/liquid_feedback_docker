@@ -3,7 +3,7 @@ liquid_feedback_docker
 
 This should set up a docker container running liquid feedback.
 
-Based on http://dev.liquidfeedback.org/trac/lf/wiki/installation.
+Based on `http://www.public-software-group.org/mercurial/liquid_feedback_frontend/raw-file/tip/INSTALL.html`.
 
 Edit the following files to your liking:
 ```
@@ -14,12 +14,21 @@ Edit the following files to your liking:
 │   └── myconfig.lua
 ```
 
-Generate ```./selfsigned.pem``` or get a proper certificate somewhere,
+If you want to use SSL: generate ```./selfsigned.pem``` or get a proper certificate somewhere,
 ```
 openssl genrsa -des3 -out testing.key 2048
 openssl req -new -key testing.key -out testing.csr
 openssl x509 -req -days 365 -in testing.csr -signkey testing.key -out testing.crt
 cat testing.key testing.crt > selfsigned.pem
+```
+and comment out the following lines in the `Dockerfile`
+```
+EXPOSE 443
+
+ADD selfsigned.pem /etc/lighttpd/selfsigned.pem
+RUN chown www-data:www-data /etc/lighttpd/selfsigned.pem
+ADD config/10-ssl.conf /etc/lighttpd/conf-available/10-ssl.conf
+RUN ln -s  /etc/lighttpd/conf-available/10-ssl.conf  /etc/lighttpd/conf-enabled/10-ssl.conf
 ```
 
 Build with
