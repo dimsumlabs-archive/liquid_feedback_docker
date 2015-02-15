@@ -14,6 +14,21 @@ Edit the following files to your liking:
 │   └── myconfig.lua
 ```
 
+Build with
+```
+docker build -t dimsumlabs/lqfb .
+```
+Run with
+```
+docker run -p 443:443 -p 80:80 -i -t dimsumlabs/lqfb /sbin/my_init -- bash -l
+```
+
+Configure exim `dpkg-reconfigure exim4-config` and you should be good to go.
+
+
+Enable SSL
+----------
+
 If you want to use SSL: generate ```./selfsigned.pem``` or get a proper certificate somewhere,
 ```
 openssl genrsa -des3 -out testing.key 2048
@@ -31,13 +46,6 @@ ADD config/10-ssl.conf /etc/lighttpd/conf-available/10-ssl.conf
 RUN ln -s  /etc/lighttpd/conf-available/10-ssl.conf  /etc/lighttpd/conf-enabled/10-ssl.conf
 ```
 
-Build with
-```
-docker build -t dimsumlabs/lqfb .
-```
-Run with
-```
-docker run -p 443:443 -p 80:80 -i -t dimsumlabs/lqfb /sbin/my_init -- bash -l
-```
-
-Configure exim `dpkg-reconfigure exim4-config` and you should be good to go.
+Add Invite Codes
+----------------
+If you want to use generate invite codes use `python scripts/invitecode_gen.py` to generate 50 invite codes and the matching SQL statements.
