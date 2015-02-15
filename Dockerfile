@@ -79,15 +79,12 @@ RUN ln -s /etc/lighttpd/conf-available/60-liquidfeedback.conf /etc/lighttpd/conf
 ADD config/myconfig.lua /opt/liquid_feedback_frontend/config/myconfig.lua
 
 ADD scripts/lf_updated /opt/liquid_feedback_core/lf_updated
+ADD scripts/lf_notify /opt/liquid_feedback_frontend/lf_notify
+
 ADD scripts/lf_update_run /etc/service/lf_updated/run
+ADD scripts/lf_notify_run /etc/service/lf_notify/run
 ADD scripts/start_lighttpd /etc/service/lighttpd/run
 ADD scripts/start_psql /etc/service/psql/run
-
-WORKDIR /opt/liquid_feedback_frontend/
-
-# this command hangs for some reason
-#RUN su postgres  -c "/etc/init.d/postgresql start" && \
-#    su www-data -c "echo 'Event:send_notifications_loop()' | ../webmcp/bin/webmcp_shell myconfig"
 
 #EXPOSE 443
 

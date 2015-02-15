@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /opt/liquid_feedback_frontend/lf_notify
