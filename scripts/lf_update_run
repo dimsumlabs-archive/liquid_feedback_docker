@@ -1,3 +1,3 @@
 #!/bin/sh
 exec /opt/liquid_feedback_core/lf_updated
-
+exec /opt/liquid_feedback_frontend/lf_notify

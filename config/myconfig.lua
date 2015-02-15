@@ -4,7 +4,7 @@
 
 -- Name of this instance, defaults to name of config file
 -- ------------------------------------------------------------------------
-config.instance_name = "Dimsumlabs"
+config.instance_name = "Instance name"
 
 
 -- Information about service provider (HTML)
@@ -12,9 +12,9 @@ config.instance_name = "Dimsumlabs"
 config.app_service_provider = "Snake Oil<br/>10000 Berlin<br/>Germany"
 
 
--- A rocketwiki formatted text the user has to accept while registering
+-- A HTML formatted text the user has to accept while registering
 -- ------------------------------------------------------------------------
-config.use_terms = "=== Terms of Use ==="
+config.use_terms = "<h1>Terms of Use</h1><p>Insert terms here</p>"
 
 
 -- Checkbox(es) the user has to accept while registering
@@ -45,9 +45,29 @@ config.database = { engine='postgresql', dbname='liquid_feedback' }
 
 -- Location of the rocketwiki binaries
 -- ------------------------------------------------------------------------
-config.formatting_engine_executeables = {
-  rocketwiki= "/opt/rocketwiki-lqfb/rocketwiki-lqfb",
-  compat = "/opt/rocketwiki-lqfb/rocketwiki-lqfb-compat"
+config.enforce_formatting_engine = "markdown2"
+config.formatting_engines = {
+  { id = "markdown2",
+    name = "python-markdown2",
+    executable = "markdown2",
+    args = {'-s', 'escape', '-x', 'nofollow,wiki-tables'},
+    remove_images = true
+  },
+  { id = "markdown_py",
+    name = "Python Markdown",
+    executable = "markdown_py",
+    args = {'-s', 'escape', '-x', 'extra', '-x', 'nl2br', '-x', 'sane_lists'},
+    remove_images = true
+  },
+  { id = "rocketwiki",
+    name = "RocketWiki",
+    executable = "/opt/rocketwiki-lqfb/rocketwiki-lqfb"
+  },
+  { id = "compat",
+    name = "Traditional WIKI syntax",
+    executable = "/opt/rocketwiki-lqfb/rocketwiki-lqfb-compat"
+  },
+
 }
 
 
@@ -76,9 +96,17 @@ config.public_access = "none"
 -- Remove leading -- to use a option
 -- ========================================================================
 
+-- Disable registration
+-- ------------------------------------------------------------------------
+-- Available options:
+-- false: registration is enabled (default)
+-- true: registration is disabled
+-- ------------------------------------------------------------------------
+-- config.disable_registration = true
+
 -- List of enabled languages, defaults to available languages
 -- ------------------------------------------------------------------------
--- config.enabled_languages = { 'en', 'de', 'eo', 'el', 'hu', 'it', 'nl', 'zh-Hans', 'zh-TW' }
+-- config.enabled_languages = { 'en', 'de', 'eo', 'el', 'hu', 'it', 'ka', 'nl', 'zh-Hans', 'zh-TW' }
 
 -- Default language, defaults to "en"
 -- ------------------------------------------------------------------------
@@ -146,9 +174,13 @@ end
 --  photo =  function(data) return extos.pfilter(data, "convert", "jpeg:-", "-thumbnail", "240x240", "jpeg:-") end
 --}
 
--- Display a public message of the day
+-- Display a html formatted public message of the day
 -- ------------------------------------------------------------------------
--- config.motd_public = "===Message of the day===\nThe MOTD is formatted with rocket wiki"
+-- config.motd_public = "<h1>Message of the day (public)</h1><p>The MOTD is formatted with HTML</p>"
+
+-- Display a html formatted internal message of the day
+-- ------------------------------------------------------------------------
+-- config.motd_intern = "<h1>Message of the day (intern)</h1><p>The MOTD is formatted with HTML</p>"
 
 -- Automatic issue related discussion URL
 -- ------------------------------------------------------------------------
@@ -209,13 +241,31 @@ config.free_timing = {
   end
 }
 
+-- Admin logger
+-- ------------------------------------------------------------------------
+-- Logging administrative activities
+-- disabled by default
+
+--[[
+config.admin_logger = function(params)
+
+  local adminid = app.session.member_id
+  local adminname = app.session.member.name
+  local url = params._webmcp_path
+  
+  -- do something (e.g. calling 'logger' via extos.pfilter)
+
+end
+--]]
+
+
 -- WebMCP accelerator
 -- uncomment the following two lines to use C implementations of chosen
 -- functions and to disable garbage collection during the request, to
 -- increase speed:
 -- ------------------------------------------------------------------------
--- require 'webmcp_accelerator'
--- if cgi then collectgarbage("stop") end
+require 'webmcp_accelerator'
+if cgi then collectgarbage("stop") end
 
 -- Trace debug
 -- uncomment the following line to enable debug trace

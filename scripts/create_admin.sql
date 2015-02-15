@@ -1,1 +1,17 @@
-INSERT INTO member (login, name, admin, invite_code) VALUES ('admin', 'Administrator', TRUE, 'admin_invite_token');
+INSERT INTO "member" (
+        "login",
+        "password",
+        "active",
+        "admin",
+        "name",
+        "activated",
+        "last_activity"
+    ) VALUES (
+        'admin',
+        '$1$.EMPTY.$LDufa24OE2HZFXAXh71Eb1',
+        TRUE,
+        TRUE,
+        'Administrator',
+        NOW(),
+        NOW()
+    );
