@@ -1,0 +1,2 @@
+ #!/bin/sh
+ exec /usr/sbin/exim -bdf -q30m

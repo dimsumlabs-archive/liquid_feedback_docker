@@ -31,4 +31,4 @@ Run with
 docker run -p 443:443 -p 80:80 -i -t dimsumlabs/lqfb /sbin/my_init -- bash -l
 ```
 
-Configure postfix and you should be good to go.
+Configure exim `dpkg-reconfigure exim4-config` and you should be good to go.
