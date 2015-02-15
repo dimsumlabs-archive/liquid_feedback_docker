@@ -85,7 +85,7 @@ ADD scripts/lf_update_run /etc/service/lf_updated/run
 ADD scripts/lf_notify_run /etc/service/lf_notify/run
 ADD scripts/start_lighttpd /etc/service/lighttpd/run
 ADD scripts/start_psql /etc/service/psql/run
-ADD scripts/start_exim /etc/exim/psql/run
+ADD scripts/start_exim /etc/service/exim/run
 
 
 #EXPOSE 443
